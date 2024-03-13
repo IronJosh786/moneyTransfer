@@ -21,6 +21,8 @@ const moneyTransactionSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+moneyTransactionSchema.plugin(mongooseAggregatePaginate);
+
 export const MoneyTransaction = mongoose.model(
     "MoneyTransaction",
     moneyTransactionSchema

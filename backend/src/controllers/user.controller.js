@@ -344,40 +344,6 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User not found");
     }
 
-    // const transactionHistory = await MoneyUser.aggregate([
-    //     {
-    //         $lookup: {
-    //             from: "moneyTransactions",
-    //             let: { userId: "$req.user?._id" },
-    //             pipeline: [
-    //                 {
-    //                     $match: {
-    //                         $expr: {
-    //                             $or: [
-    //                                 { $eq: ["$from", "$$userId"] },
-    //                                 { $eq: ["$to", "$$userId"] },
-    //                             ],
-    //                         },
-    //                     },
-    //                 },
-    //             ],
-    //             as: "transactionHistory",
-    //         },
-    //     },
-    //     {
-    //         $project: {
-    //             password: 0,
-    //             refreshToken: 0,
-    //         },
-    //     },
-    //     {
-    //         $skip: parseInt(start),
-    //     },
-    //     {
-    //         $limit: parseInt(limit),
-    //     },
-    // ]);
-
     const transactionHistory = await MoneyUser.aggregate([
         {
             $lookup: {

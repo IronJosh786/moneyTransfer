@@ -59,7 +59,7 @@ const newTransaction = asyncHandler(async (req, res) => {
             .json(new ApiResponse(200, transaction, "Transaction successful"));
     } catch (error) {
         if (!commited) {
-            session.abortTransaction();
+            await session.abortTransaction();
         }
         session.endSession();
         throw new ApiError(400, "Transaction failed");

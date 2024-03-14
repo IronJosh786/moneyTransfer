@@ -1,5 +1,5 @@
 import { MoneyTransaction } from "../models/transaction.model.js";
-import { MoneyUser } from "../models/user.model";
+import { MoneyUser } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 

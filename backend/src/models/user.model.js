@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const moneyUserSchema = new mongoose.Schema(
     {
@@ -88,5 +89,7 @@ moneyUserSchema.methods.generateRefreshToken = function () {
         }
     );
 };
+
+moneyUserSchema.plugin(mongooseAggregatePaginate);
 
 export const MoneyUser = mongoose.model("MoneyUser", moneyUserSchema);

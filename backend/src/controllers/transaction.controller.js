@@ -24,6 +24,13 @@ const newTransaction = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Receiver does not exist");
     }
 
+    const transactionDetails = {
+        senderUsername: sender.username,
+        senderProfilePicture: sender.profilePicture,
+        receiverUsername: receiver.username,
+        receiverProfilePicture: receiver.profilePicture,
+    };
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -41,6 +48,7 @@ const newTransaction = asyncHandler(async (req, res) => {
                     to: receiver._id,
                     amount,
                     message,
+                    participantsDetails: transactionDetails,
                 },
             ],
             { session }
@@ -50,10 +58,10 @@ const newTransaction = asyncHandler(async (req, res) => {
         session.endSession();
 
         return res
-            .status(200)
+            .status(201)
             .json(
                 new ApiResponse(
-                    200,
+                    201,
                     newTransactionRecord,
                     "Transaction successful"
                 )
@@ -61,7 +69,7 @@ const newTransaction = asyncHandler(async (req, res) => {
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
-        throw error;
+        throw new ApiError(500, "Transaction failed");
     }
 });
 

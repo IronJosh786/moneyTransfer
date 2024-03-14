@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+
+const detailsSchema = new mongoose.Schema({
+    senderUsername: {
+        type: String,
+    },
+    senderProfilePicture: {
+        type: String,
+    },
+    receiverUsername: {
+        type: String,
+    },
+    receiverProfilePicture: {
+        type: String,
+    },
+});
 
 const moneyTransactionSchema = new mongoose.Schema(
     {
@@ -18,11 +32,10 @@ const moneyTransactionSchema = new mongoose.Schema(
         message: {
             type: String,
         },
+        participantsDetails: detailsSchema,
     },
     { timestamps: true }
 );
-
-moneyTransactionSchema.plugin(mongooseAggregatePaginate);
 
 export const MoneyTransaction = mongoose.model(
     "MoneyTransaction",

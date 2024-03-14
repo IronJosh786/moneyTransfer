@@ -21,7 +21,7 @@ const generateAccessAndRefreshToken = async (id) => {
 
 const registerUser = asyncHandler(async (req, res) => {
     const { username, fullName, email, password } = req.body;
-    const localFilePath = req.file?.profilePicture[0]?.path;
+    const localFilePath = req.file?.path;
 
     if (
         [username, fullName, email, password].some(
@@ -48,7 +48,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     const profilePicturePath = await uploadOnCloudinary(localFilePath);
 
-    if (!profilePicturePath) {
+    if (!profilePicturePath.url) {
         throw new ApiError(
             500,
             "Could not upload the profile picture on cloudinary"
@@ -58,6 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await MoneyUser.create({
         username: username.toLowerCase(),
         email: email.toLowerCase(),
+        fullName,
         password,
         profilePicture: profilePicturePath.url,
     });
@@ -79,7 +80,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { email, username, password } = req.body;
 
     if (
-        (!email && !username) ||
+        !(email || username) ||
         (email && email.trim() === "") ||
         (username && username.trim() === "")
     ) {
@@ -133,7 +134,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    const user = await MoneyUser.findByIdAndUpdate(
+    await MoneyUser.findByIdAndUpdate(
         req.user?._id,
         {
             $unset: {
@@ -144,10 +145,6 @@ const logoutUser = asyncHandler(async (req, res) => {
             new: true,
         }
     );
-
-    if (!user) {
-        throw new ApiError(500, "Could not log out the user");
-    }
 
     const options = {
         httpOnly: true,
@@ -219,9 +216,9 @@ const changePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
     if (
         !oldPassword ||
-        oldPassword?.trim() === "" ||
+        oldPassword.trim() === "" ||
         !newPassword ||
-        newPassword?.trim() === ""
+        newPassword.trim() === ""
     ) {
         throw new ApiError(400, "Both the passwords are required");
     }
@@ -231,22 +228,19 @@ const changePassword = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User not found");
     }
 
-    const isPasswordCorrect = user.isPasswordCorrect(oldPassword);
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Incorrect old password");
     }
 
-    const updatedUser = await MoneyUser.findByIdAndUpdate(
-        user._id,
-        {
-            password: newPassword,
-        },
-        {
-            new: true,
-        }
-    ).select("-password -refreshToken");
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
+
+    const updatedUser = await MoneyUser.findById(user._id).select(
+        "-password -refreshToken"
+    );
     if (!updatedUser) {
-        throw new ApiError(500, "Could not update the user password");
+        throw new ApiError(500, "Could not find the user");
     }
 
     return res
@@ -293,7 +287,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserProfilePicture = asyncHandler(async (req, res) => {
-    const { localFilePath } = req.file?.profilePicture[0]?.path;
+    const localFilePath = req.file?.path;
     if (!localFilePath) {
         throw new ApiError(400, "Profile picture is required");
     }
@@ -304,7 +298,7 @@ const updateUserProfilePicture = asyncHandler(async (req, res) => {
     }
 
     const profilePicturePath = await uploadOnCloudinary(localFilePath);
-    if (!profilePicturePath) {
+    if (!profilePicturePath.url) {
         throw new ApiError(
             500,
             "Could not upload the profile picture on cloudinary"
@@ -313,7 +307,7 @@ const updateUserProfilePicture = asyncHandler(async (req, res) => {
 
     const updatedUser = await MoneyUser.findByIdAndUpdate(
         user._id,
-        { profilePicture: profilePicturePath },
+        { profilePicture: profilePicturePath.url },
         { new: true }
     ).select("-password -refreshToken");
 
@@ -350,10 +344,44 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User not found");
     }
 
+    // const transactionHistory = await MoneyUser.aggregate([
+    //     {
+    //         $lookup: {
+    //             from: "moneyTransactions",
+    //             let: { userId: "$req.user?._id" },
+    //             pipeline: [
+    //                 {
+    //                     $match: {
+    //                         $expr: {
+    //                             $or: [
+    //                                 { $eq: ["$from", "$$userId"] },
+    //                                 { $eq: ["$to", "$$userId"] },
+    //                             ],
+    //                         },
+    //                     },
+    //                 },
+    //             ],
+    //             as: "transactionHistory",
+    //         },
+    //     },
+    //     {
+    //         $project: {
+    //             password: 0,
+    //             refreshToken: 0,
+    //         },
+    //     },
+    //     {
+    //         $skip: parseInt(start),
+    //     },
+    //     {
+    //         $limit: parseInt(limit),
+    //     },
+    // ]);
+
     const transactionHistory = await MoneyUser.aggregate([
         {
             $lookup: {
-                from: "moneyTransactions",
+                from: "moneytransactions",
                 let: { userId: "$_id" },
                 pipeline: [
                     {
@@ -367,14 +395,20 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
                         },
                     },
                 ],
-                as: "transactions",
+                as: "transactionHistory",
             },
         },
         {
-            $skip: parseInt(start),
+            $project: {
+                password: 0,
+                refreshToken: 0,
+            },
         },
         {
-            $limit: parseInt(limit),
+            $skip: start,
+        },
+        {
+            $limit: limit,
         },
     ]);
 
@@ -387,7 +421,7 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                transactionHistory,
+                transactionHistory[0],
                 "Fetched the transaction history of the user"
             )
         );

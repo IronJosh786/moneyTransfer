@@ -1,75 +1,68 @@
 import { MoneyTransaction } from "../models/transaction.model.js";
 import { MoneyUser } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import mongoose from "mongoose";
 
 const newTransaction = asyncHandler(async (req, res) => {
-    const { to, amount, message } = req.body;
-
-    if (amount <= 0) {
-        throw new ApiError(400, "Amount should be greater than 0");
-    }
-
-    const sender = await MoneyUser.findById(req.user?._id);
-    if (!sender) {
-        throw new ApiError(400, "Sender does not exist");
-    }
-
-    if (sender.balance < amount) {
-        throw new ApiError(400, "Insufficient balance");
-    }
-
-    const receiver = await MoneyUser.findOne({ username: to });
-    if (!receiver) {
-        throw new ApiError(400, "Receiver does not exist");
-    }
-
-    const transactionDetails = {
-        senderUsername: sender.username,
-        senderProfilePicture: sender.profilePicture,
-        receiverUsername: receiver.username,
-        receiverProfilePicture: receiver.profilePicture,
-    };
-
     const session = await mongoose.startSession();
     session.startTransaction();
+    let commited = false;
+
+    const { to, amount, message } = req.body;
 
     try {
+        const sender = await MoneyUser.findOne({
+            _id: req.user?._id,
+        }).session(session);
+        const receiver = await MoneyUser.findOne({
+            username: to,
+        }).session(session);
+
+        if (!sender || !receiver) {
+            throw new Error("Sender or Receiver not found");
+        }
+
+        if (sender.balance < amount) {
+            throw new Error("Insufficient funds");
+        }
+
+        // Update sender's balance
         sender.balance -= amount;
-        await sender.save({ session, validateBeforeSave: false });
+        await sender.save({ validateBeforeSave: false });
 
+        // Update receiver's balance
         receiver.balance += amount;
-        await receiver.save({ session, validateBeforeSave: false });
+        await receiver.save({ validateBeforeSave: false });
 
-        const newTransactionRecord = await MoneyTransaction.create(
-            [
-                {
-                    from: req.user?._id,
-                    to: receiver._id,
-                    amount,
-                    message,
-                    participantsDetails: transactionDetails,
-                },
-            ],
-            { session }
-        );
+        const transaction = new MoneyTransaction({
+            from: sender._id,
+            to: receiver._id,
+            amount: amount,
+            message: message,
+            participantsDetails: {
+                senderUsername: sender.username,
+                senderProfilePicture: sender.profilePicture,
+                receiverUsername: receiver.username,
+                receiverProfilePicture: receiver.profilePicture,
+            },
+        });
 
+        await transaction.save({ session });
         await session.commitTransaction();
+        commited = true;
         session.endSession();
 
         return res
-            .status(201)
-            .json(
-                new ApiResponse(
-                    201,
-                    newTransactionRecord,
-                    "Transaction successful"
-                )
-            );
+            .status(200)
+            .json(new ApiResponse(200, transaction, "Transaction successful"));
     } catch (error) {
-        await session.abortTransaction();
+        if (!commited) {
+            session.abortTransaction();
+        }
         session.endSession();
-        throw new ApiError(500, "Transaction failed");
+        throw new ApiError(400, "Transaction failed");
     }
 });
 

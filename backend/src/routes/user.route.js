@@ -11,6 +11,7 @@ import {
     updateUserDetails,
     updateUserProfilePicture,
     getTransactionHistory,
+    getAllUsers,
 } from "../controllers/user.controller.js";
 
 const router = Router();
@@ -32,5 +33,6 @@ router
         updateUserProfilePicture
     );
 router.route("/get-transaction-history").get(verifyJWT, getTransactionHistory);
+router.route("/get-all-users").get(verifyJWT, getAllUsers);
 
 export default router;

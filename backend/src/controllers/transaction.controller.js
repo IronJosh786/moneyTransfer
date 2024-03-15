@@ -36,20 +36,27 @@ const newTransaction = asyncHandler(async (req, res) => {
         receiver.balance += amount;
         await receiver.save({ validateBeforeSave: false });
 
-        const transaction = new MoneyTransaction({
-            from: sender._id,
-            to: receiver._id,
-            amount: amount,
-            message: message,
-            participantsDetails: {
-                senderUsername: sender.username,
-                senderProfilePicture: sender.profilePicture,
-                receiverUsername: receiver.username,
-                receiverProfilePicture: receiver.profilePicture,
-            },
-        });
+        const transaction = await MoneyTransaction.create(
+            [
+                {
+                    from: sender._id,
+                    to: receiver._id,
+                    amount: amount,
+                    message: message,
+                    participantsDetails: {
+                        senderUsername: sender.username,
+                        senderProfilePicture: sender.profilePicture,
+                        receiverUsername: receiver.username,
+                        receiverProfilePicture: receiver.profilePicture,
+                    },
+                },
+            ],
+            { session: session }
+        );
 
-        await transaction.save({ session });
+        if (!transaction) {
+            throw new ApiError(500, "Could not complete the transaction");
+        }
         await session.commitTransaction();
         commited = true;
         session.endSession();
@@ -62,7 +69,7 @@ const newTransaction = asyncHandler(async (req, res) => {
             await session.abortTransaction();
         }
         session.endSession();
-        throw new ApiError(400, "Transaction failed");
+        throw new ApiError(400, "Transaction failed", error);
     }
 });
 

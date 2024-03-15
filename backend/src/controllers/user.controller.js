@@ -344,7 +344,12 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User not found");
     }
 
+    const userId = req.user._id;
+
     const transactionHistory = await MoneyUser.aggregate([
+        {
+            $match: { _id: userId },
+        },
         {
             $lookup: {
                 from: "moneytransactions",
@@ -358,6 +363,11 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
                                     { $eq: ["$to", "$$userId"] },
                                 ],
                             },
+                        },
+                    },
+                    {
+                        $sort: {
+                            createdAt: -1,
                         },
                     },
                 ],
@@ -393,6 +403,22 @@ const getTransactionHistory = asyncHandler(async (req, res) => {
         );
 });
 
+const getAllUsers = asyncHandler(async (req, res) => {
+    const users = await MoneyUser.find().select(
+        "-password -refreshToken -balance -transactionHistory -createdAt -updatedAt -__v"
+    );
+
+    if (!users || users.length === 0) {
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {}, "No users to show"));
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, users, "Fetched users successfully"));
+});
+
 export {
     registerUser,
     loginUser,
@@ -403,4 +429,5 @@ export {
     updateUserDetails,
     updateUserProfilePicture,
     getTransactionHistory,
+    getAllUsers,
 };

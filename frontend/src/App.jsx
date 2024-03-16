@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "./features/darkModeSlice.js";
 import "./App.css";
+import Home from "./pages/Home.jsx";
 
 const App = () => {
   const { isDarkMode } = useSelector((state) => state.darkMode);
@@ -19,7 +20,11 @@ const App = () => {
     }
   }, [isDarkMode]);
 
-  return <div></div>;
+  return (
+    <div>
+      <Home />
+    </div>
+  );
 };
 
 export default App;

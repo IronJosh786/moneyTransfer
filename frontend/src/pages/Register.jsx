@@ -70,7 +70,7 @@ function Register() {
 
   return (
     <div className="w-full md:w-1/2">
-      <div className="max-w-[380px] mx-auto flex flex-col justify-center gap-4 p-4 rounded-md shadow-xl drop-shadow-md">
+      <div className="max-w-[380px] mx-auto flex flex-col justify-center gap-4 p-4 rounded-md shadow-md drop-shadow-md dark:shadow-gray">
         <h2 className="font-h3 mb-4 font-semibold">Register</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label htmlFor="fullName" className="font-base font-medium">

@@ -13,7 +13,7 @@ const App = () => {
         <div className="w-full md:w-1/2 text-center font-h2 font-bold">
           Money Transfer
         </div>
-        <Register />
+        <Login />
       </div>
     </div>
   );

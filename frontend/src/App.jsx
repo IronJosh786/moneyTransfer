@@ -1,28 +1,20 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { toggleTheme } from "./features/darkModeSlice.js";
+import React from "react";
 import "./App.css";
 import Home from "./pages/Home.jsx";
+import Register from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
+import Navbar from "./components/Navbar.jsx";
 
 const App = () => {
-  const { isDarkMode } = useSelector((state) => state.darkMode);
-  const dispatch = useDispatch();
-
-  const handleToggleTheme = () => {
-    dispatch(toggleTheme());
-  };
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
-
   return (
-    <div>
-      <Home />
+    <div className="">
+      <Navbar />
+      <div className="flex flex-col md:flex-row gap-8 md:gap-0 mt-12 md:mt-0 justify-center items-center">
+        <div className="w-full md:w-1/2 text-center font-h2 font-bold">
+          Money Transfer
+        </div>
+        <Register />
+      </div>
     </div>
   );
 };

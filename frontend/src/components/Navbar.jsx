@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../features/darkModeSlice.js";
 import "../App.css";
 
 function Navbar() {
   const { isDarkMode } = useSelector((state) => state.darkMode);
+  const { userData } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const handleToggleTheme = () => {
     dispatch(toggleTheme());
@@ -20,13 +22,45 @@ function Navbar() {
   }, [isDarkMode]);
 
   return (
-    <div className="flex justify-between px-8 py-4 shadow-md">
-      <button className="font-h5 font-semibold cursor-pointer">
-        Money Transfer
+    <div className="relative flex justify-between items-center px-8 py-1 shadow-md">
+      <button className="font-h2 cursor-pointer">
+        <i className="ri-exchange-dollar-line"></i>
       </button>
-      <button onClick={handleToggleTheme}>
-        {isDarkMode ? "Light" : "Dark"}
-      </button>
+      <div className="flex gap-8">
+        <button
+          onClick={handleToggleTheme}
+          className="font-semibold cursor-pointer"
+        >
+          {isDarkMode ? (
+            <i className="ri-sun-line font-h6"></i>
+          ) : (
+            <i className="ri-moon-line font-h6"></i>
+          )}
+        </button>
+        {userData ? (
+          <button
+            onClick={() => {
+              setIsMobileNavOpen(!isMobileNavOpen);
+            }}
+          >
+            <i className="ri-menu-line font-h6 lg:hidden"></i>
+            <div
+              className={`absolute top-full right-8 z-10 ${
+                isMobileNavOpen ? "block" : "hidden"
+              } border-2 border-gray rounded-md bg-bg_light dark:bg-bg_dark lg:hidden`}
+            >
+              <ul className="flex flex-col gap-4 px-2 py-4">
+                <li className="font-sm">Profile</li>
+                <li className="font-sm">All Users</li>
+                <li className="font-sm">New Transaction</li>
+                <li className="font-sm">Transaction History</li>
+              </ul>
+            </div>
+          </button>
+        ) : (
+          ""
+        )}
+      </div>
     </div>
   );
 }

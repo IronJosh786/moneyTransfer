@@ -8,13 +8,14 @@ import Navbar from "./components/Navbar.jsx";
 const App = () => {
   return (
     <div className="">
-      <Navbar />
+      {/* <Navbar />
       <div className="flex flex-col md:flex-row gap-8 md:gap-0 mt-12 md:mt-0 justify-center items-center">
         <div className="w-full md:w-1/2 text-center font-h2 font-bold">
           Money Transfer
         </div>
         <Login />
-      </div>
+      </div> */}
+      <Home />
     </div>
   );
 };

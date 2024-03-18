@@ -40,7 +40,6 @@ function Register() {
       const response = await axios.post("/api/v2/users/register", data);
       if (response.data.success) setSuccess(response.data.data);
     } catch (error) {
-      console.error(error);
       if (error.response) {
         // Server responded with an error
         const errorMessage = extractErrorMessage(error.response.data);

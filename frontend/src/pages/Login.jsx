@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../App.css";
+import { setData } from "../features/userSlice.js";
+import { useDispatch, useSelector } from "react-redux";
 
 function Login() {
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
+
   const [formData, setFormData] = useState({
     emailOrUsername: "",
     password: "",
@@ -30,8 +35,16 @@ function Login() {
     try {
       const response = await axios.post("/api/v2/users/login", data);
       if (response.data.success) setSuccess(response.data.data);
+      const userDetails = {
+        _id: response.data.message.user._id,
+        fullName: response.data.message.user.fullName,
+        userName: response.data.message.user.username,
+        email: response.data.message.user.email,
+        profilePictureUrl: response.data.message.user.profilePicture,
+        balance: response.data.message.user.balance,
+      };
+      dispatch(setData(userDetails));
     } catch (error) {
-      console.error(error);
       if (error.response) {
         // Server responded with an error
         const errorMessage = extractErrorMessage(error.response.data);

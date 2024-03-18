@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../features/darkModeSlice.js";
 import "../App.css";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
   const { isDarkMode } = useSelector((state) => state.darkMode);
@@ -22,7 +23,7 @@ function Navbar() {
   }, [isDarkMode]);
 
   return (
-    <div className="relative flex justify-between items-center px-8 py-1 shadow-md">
+    <div className="relative flex justify-between items-center px-8 py-1 mb-4 shadow-md shadow-gray">
       <button className="font-h2 cursor-pointer">
         <i className="ri-exchange-dollar-line"></i>
       </button>
@@ -50,10 +51,18 @@ function Navbar() {
               } border-2 border-gray rounded-md bg-bg_light dark:bg-bg_dark lg:hidden`}
             >
               <ul className="flex flex-col gap-4 px-2 py-4">
-                <li className="font-sm">Profile</li>
-                <li className="font-sm">All Users</li>
-                <li className="font-sm">New Transaction</li>
-                <li className="font-sm">Transaction History</li>
+                <li className="font-sm">
+                  <NavLink>Profile</NavLink>
+                </li>
+                <li className="font-sm">
+                  <NavLink to={"/"}>All Users</NavLink>
+                </li>
+                <li className="font-sm">
+                  <NavLink to={"/new-transaction"}>New Transaction</NavLink>
+                </li>
+                <li className="font-sm">
+                  <NavLink to={"/all-transactions"}>All Transactions</NavLink>
+                </li>
               </ul>
             </div>
           </button>

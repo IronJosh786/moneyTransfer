@@ -1,19 +1,23 @@
 import React from "react";
-import Navbar from "../components/Navbar.jsx";
+import { useSelector } from "react-redux";
 import LeftBar from "../components/Leftbar.jsx";
 import Rightbar from "../components/Rightbar.jsx";
 import AllUser from "../components/AllUser.jsx";
-import NewTransaction from "../components/NewTransaction.jsx";
+import Login from "./Login.jsx";
+import { Outlet } from "react-router-dom";
 
 function Home() {
+  const { userData } = useSelector((state) => state.user);
+
+  if (!userData) {
+    return <Login />;
+  }
+
   return (
-    <div>
-      <Navbar />
-      <div className="grid">
-        <LeftBar className={"grid-cols-3"} />
-        <Rightbar className={"grid-cols-3"} />
-        <AllUser className={"grid-cols-6"} />
-      </div>
+    <div className="grid lg:grid-cols-12">
+      <LeftBar />
+      <Outlet />
+      <Rightbar />
     </div>
   );
 }

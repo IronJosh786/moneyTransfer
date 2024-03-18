@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function AllUser({ className }) {
+function AllUser() {
   const [allUser, setAllUser] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -10,8 +10,9 @@ function AllUser({ className }) {
     const fetchAllUsers = async () => {
       try {
         const response = await axios.get("/api/v2/users/get-all-users");
-        if (response.data.success) setSuccess("Fetched Users Successfully");
+        if (response.data.success) setSuccess(response.data.data);
         console.log(response.data);
+        setAllUser(response.data.message);
       } catch (error) {
         if (error.response) {
           // Server responded with an error
@@ -27,7 +28,7 @@ function AllUser({ className }) {
       }
     };
     fetchAllUsers();
-  }, [allUser]);
+  }, []);
 
   const extractErrorMessage = (htmlString) => {
     const regex = /<pre>(.*?)<br>/s;
@@ -40,7 +41,14 @@ function AllUser({ className }) {
     }
   };
 
-  return <div className={`${className}`}></div>;
+  return (
+    <div className={`col-span-8`}>
+      <h4 className="font-h4">All Users</h4>
+      {allUser.map((singleUser) => (
+        <div key={singleUser._id}>{singleUser.username}</div>
+      ))}
+    </div>
+  );
 }
 
 export default AllUser;

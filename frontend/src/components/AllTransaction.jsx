@@ -12,8 +12,8 @@ function AllTransaction() {
         const response = await axios.get(
           "/api/v2/users/get-transaction-history"
         );
-        if (response.data.success)
-          setSuccess("Fetched Transactions Successfully");
+        if (response.data.success) setSuccess(response.data.data);
+        setallTransaction(response.data.message.transactionHistory);
         console.log(response.data);
       } catch (error) {
         if (error.response) {
@@ -30,7 +30,7 @@ function AllTransaction() {
       }
     };
     fetchAllTransactions();
-  }, [allTransaction]);
+  }, []);
 
   const extractErrorMessage = (htmlString) => {
     const regex = /<pre>(.*?)<br>/s;
@@ -43,7 +43,15 @@ function AllTransaction() {
     }
   };
 
-  return <div className={`${className}`}>AllTransaction</div>;
+  return (
+    <div className={`col-span-8`}>
+      <h4 className="font-h4">All Transactions</h4>
+      {allTransaction.length === 0 ? "No transaction to show" : ""}
+      {allTransaction.map((singleTransaction) => (
+        <div key={singleTransaction._id}>{singleTransaction._id}</div>
+      ))}
+    </div>
+  );
 }
 
 export default AllTransaction;

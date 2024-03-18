@@ -30,7 +30,7 @@ function NewTransaction({ givenUserName = "" }) {
         "/api/v2/transactions/new-transaction",
         transactionDetails
       );
-      if (response.data.data) setSuccess("Made Transaction Successfully");
+      if (response.data.data) setSuccess(response.data.data);
       console.log(response.data);
     } catch (error) {
       if (error.response) {
@@ -48,7 +48,7 @@ function NewTransaction({ givenUserName = "" }) {
   };
 
   const extractErrorMessage = (htmlString) => {
-    const regex = /<pre>(.*?)<br>/s;
+    const regex = /<pre>(.*?)(?=<\s*\/pre|\s*<br>)/s;
     const match = htmlString.match(regex);
     if (match) {
       return match[1];
@@ -59,7 +59,8 @@ function NewTransaction({ givenUserName = "" }) {
   };
 
   return (
-    <div>
+    <div className="col-span-8">
+      <h4 className="font-h4">New Transaction</h4>
       <form onSubmit={handleSubmit}>
         <label htmlFor="username" className="font-base font-medium">
           Username<span className="text-sent">*</span>
@@ -94,6 +95,14 @@ function NewTransaction({ givenUserName = "" }) {
         >
           Send
         </button>
+        {error && (
+          <div className="font-sm text-center mt-8 text-sent">{error}</div>
+        )}
+        {success && (
+          <div className="font-sm text-center mt-8 text-received">
+            {success}
+          </div>
+        )}
       </form>
     </div>
   );

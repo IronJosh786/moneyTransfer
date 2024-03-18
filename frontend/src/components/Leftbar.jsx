@@ -1,12 +1,23 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
-function Leftbar({ className }) {
+function Leftbar() {
   return (
-    <div className={`${className} hidden lg:flex flex-col gap-8 h-full`}>
-      <div>Profile</div>
-      <div>All Users</div>
-      <div>New Transaction</div>
-      <div>Transaction History</div>
+    <div
+      className={`col-span-2 px-8 hidden lg:flex flex-col gap-8 font-base font-semibold`}
+    >
+      <div className="cursor-pointer">
+        <NavLink to="/profile">Profile</NavLink>
+      </div>
+      <div className="cursor-pointer">
+        <NavLink to="/">All Users</NavLink>
+      </div>
+      <div className="cursor-pointer">
+        <NavLink to="/new-transaction">New Transaction</NavLink>
+      </div>
+      <div className="cursor-pointer">
+        <NavLink to="/all-transactions">Transaction History</NavLink>
+      </div>
     </div>
   );
 }

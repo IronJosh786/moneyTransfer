@@ -52,7 +52,7 @@ function Navbar() {
             >
               <ul className="flex flex-col gap-4 px-2 py-4">
                 <li className="font-sm">
-                  <NavLink>Profile</NavLink>
+                  <NavLink to={"/profile"}>Profile</NavLink>
                 </li>
                 <li className="font-sm">
                   <NavLink to={"/"}>All Users</NavLink>

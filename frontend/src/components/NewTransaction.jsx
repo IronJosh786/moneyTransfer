@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setData } from "../features/userSlice.js";
 
 function NewTransaction({ givenUserName = "" }) {
-  const [data, setData] = useState({
+  const [details, setDetails] = useState({
     username: givenUserName,
     amount: 0,
     message: "",
@@ -10,8 +12,11 @@ function NewTransaction({ givenUserName = "" }) {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
+
   const handleChange = (e) => {
-    setData({ ...data, [e.target.id]: e.target.value });
+    setDetails({ ...details, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -20,9 +25,9 @@ function NewTransaction({ givenUserName = "" }) {
     setSuccess(null);
 
     const transactionDetails = {
-      to: data.username,
-      amount: data.amount,
-      message: data.message,
+      to: details.username,
+      amount: details.amount,
+      message: details.message,
     };
 
     try {
@@ -31,7 +36,9 @@ function NewTransaction({ givenUserName = "" }) {
         transactionDetails
       );
       if (response.data.data) setSuccess(response.data.data);
-      console.log(response.data);
+      dispatch(
+        setData({ ...userData, balance: userData.balance - details.amount })
+      );
     } catch (error) {
       if (error.response) {
         // Server responded with an error
@@ -59,9 +66,12 @@ function NewTransaction({ givenUserName = "" }) {
   };
 
   return (
-    <div className="col-span-8">
+    <div className="col-span-8 px-8 xl:px-0">
       <h4 className="font-h4">New Transaction</h4>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="my-4 flex flex-col border-2 border-gray rounded-md p-4 gap-4"
+      >
         <label htmlFor="username" className="font-base font-medium">
           Username<span className="text-sent">*</span>
         </label>
@@ -83,18 +93,20 @@ function NewTransaction({ givenUserName = "" }) {
         <label htmlFor="message" className="font-base font-medium">
           Message<span className="text-sent">*</span>
         </label>
-        <input
+        <textarea
           id="message"
-          type="text"
+          cols="20"
+          rows="3"
           onChange={handleChange}
-          className="p-1 font-sm rounded-md border border-gray dark:bg-bg_dark"
-        />
+          className="shrink border border-gray rounded-md p-1 font-sm resize-none dark:bg-bg_dark"
+        ></textarea>
         <button
-          className="py-1 font-h6 mt-8 font-medium rounded-md bg-primary_dark text-text_dark hover:bg-primary_light"
+          className="p-2 rounded-md font-sm text-white bg-primary_dark dark:bg-primary_light hover:bg-primary_light dark:hover:bg-primary_dark"
           type="submit"
         >
-          Send
+          Send <i className="ri-send-plane-2-fill"></i>
         </button>
+        <div className="text-center lg:hidden">Balance: {userData.balance}</div>
         {error && (
           <div className="font-sm text-center mt-8 text-sent">{error}</div>
         )}

@@ -4,6 +4,9 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
+      screens: {
+        xs: "380px",
+      },
       colors: {
         sent: "#D13328",
         received: "#349766",

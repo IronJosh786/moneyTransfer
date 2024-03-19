@@ -85,7 +85,7 @@ input[type="file"]::file-selector-button {
   background: #5a75ce;
   padding: 0.4rem;
   border-radius: 10px;
-  color: #abb9e8;
+  color: white;
   cursor: pointer;
   border: 0;
 }

@@ -116,7 +116,7 @@ function Login() {
               </div>
             )}
             <button
-              className="py-1 font-h6 mt-8 font-medium rounded-md bg-primary_dark text-text_dark hover:bg-primary_light"
+              className="py-1 font-h6 mt-8 font-medium rounded-md bg-primary_dark text-white hover:bg-primary_light"
               type="submit"
             >
               Login

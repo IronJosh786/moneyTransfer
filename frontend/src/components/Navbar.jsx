@@ -2,16 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleTheme } from "../features/darkModeSlice.js";
 import "../App.css";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { setData } from "../features/userSlice.js";
+import axios from "axios";
 
 function Navbar() {
   const { isDarkMode } = useSelector((state) => state.darkMode);
   const { userData } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleToggleTheme = () => {
     dispatch(toggleTheme());
+  };
+
+  const handleLogout = async () => {
+    const response = await axios.post("/api/v2/users/logout");
+    if (response.data.success) {
+      dispatch(setData(null));
+      navigate("/login");
+    }
   };
 
   useEffect(() => {
@@ -50,10 +61,7 @@ function Navbar() {
                 isMobileNavOpen ? "block" : "hidden"
               } border-2 border-gray rounded-md bg-bg_light dark:bg-bg_dark lg:hidden`}
             >
-              <ul className="flex flex-col gap-4 px-2 py-4">
-                <li className="font-sm">
-                  <NavLink to={"/profile"}>Profile</NavLink>
-                </li>
+              <ul className="flex flex-col gap-4 px-4 py-4">
                 <li className="font-sm">
                   <NavLink to={"/"}>All Users</NavLink>
                 </li>
@@ -62,6 +70,12 @@ function Navbar() {
                 </li>
                 <li className="font-sm">
                   <NavLink to={"/all-transactions"}>All Transactions</NavLink>
+                </li>
+                <li className="font-sm">
+                  <NavLink to={"/profile"}>My Profile</NavLink>
+                </li>
+                <li className="font-sm">
+                  <button onClick={handleLogout}>Logout</button>
                 </li>
               </ul>
             </div>

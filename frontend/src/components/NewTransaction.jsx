@@ -66,7 +66,7 @@ function NewTransaction({ givenUserName = "" }) {
   };
 
   return (
-    <div className="col-span-8 px-8 xl:px-0">
+    <div className="col-span-8 px-8 lg:px-0">
       <h4 className="font-h4">New Transaction</h4>
       <form
         onSubmit={handleSubmit}

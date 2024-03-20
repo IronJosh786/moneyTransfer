@@ -10,7 +10,8 @@ const newTransaction = asyncHandler(async (req, res) => {
     session.startTransaction();
     let commited = false;
 
-    const { to, amount, message } = req.body;
+    let { to, amount, message } = req.body;
+    amount = parseInt(amount);
 
     try {
         const sender = await MoneyUser.findOne({

@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setData } from "../features/userSlice.js";
+import { fetchData } from "../fetchData.js";
+import { useParams } from "react-router-dom";
 
-function NewTransaction({ givenUserName = "" }) {
+function NewTransaction() {
+  const { givenUserName } = useParams() || "";
+
   const [details, setDetails] = useState({
     username: givenUserName,
     amount: 0,
@@ -36,9 +39,7 @@ function NewTransaction({ givenUserName = "" }) {
         transactionDetails
       );
       if (response.data.data) setSuccess(response.data.data);
-      dispatch(
-        setData({ ...userData, balance: userData.balance - details.amount })
-      );
+      await fetchData(dispatch);
     } catch (error) {
       if (error.response) {
         // Server responded with an error
@@ -78,6 +79,7 @@ function NewTransaction({ givenUserName = "" }) {
         <input
           id="username"
           type="text"
+          value={details.username}
           onChange={handleChange}
           className="p-1 font-sm rounded-md border border-gray dark:bg-bg_dark"
         />

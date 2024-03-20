@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import NewTransaction from "./NewTransaction";
 
 function AllUser() {
   const [allUser, setAllUser] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleSend = (givenUsername) => {
+    navigate(`/new-transaction/${givenUsername}`);
+  };
 
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -63,7 +71,10 @@ function AllUser() {
               </div>
             </div>
             <div>
-              <button className="border-2 border-gray p-1 rounded-md font-sm text-white bg-primary_dark dark:bg-primary_light hover:bg-primary_light dark:hover:bg-primary_dark">
+              <button
+                onClick={() => handleSend(singleUser.username)}
+                className="border-2 border-gray p-1 rounded-md font-sm text-white bg-primary_dark dark:bg-primary_light hover:bg-primary_light dark:hover:bg-primary_dark"
+              >
                 Send <i className="ri-send-plane-2-fill"></i>
               </button>
             </div>

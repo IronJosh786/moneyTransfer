@@ -29,7 +29,10 @@ const App = () => {
         <Route path="/" element={<Home />}>
           <Route path="/" element={<AllUser />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/new-transaction" element={<NewTransaction />} />
+          <Route
+            path="/new-transaction/:givenUserName?"
+            element={<NewTransaction />}
+          />
           <Route path="/all-transactions" element={<AllTransaction />} />
         </Route>
         <Route path="/register" element={<Register />} />

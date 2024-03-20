@@ -35,9 +35,9 @@ function Navbar() {
 
   return (
     <div className="relative flex justify-between items-center px-8 py-1 mb-4 shadow-md shadow-gray">
-      <button className="font-h2 cursor-pointer">
+      <NavLink to={"/"} className="font-h2 cursor-pointer">
         <i className="ri-exchange-dollar-line"></i>
-      </button>
+      </NavLink>
       <div className="flex gap-8">
         <button
           onClick={handleToggleTheme}
@@ -75,7 +75,7 @@ function Navbar() {
                   <NavLink to={"/profile"}>My Profile</NavLink>
                 </li>
                 <li className="font-sm">
-                  <button onClick={handleLogout}>Logout</button>
+                  <div onClick={handleLogout}>Logout</div>
                 </li>
               </ul>
             </div>

@@ -9,34 +9,28 @@ import AllUser from "./components/AllUser.jsx";
 import NewTransaction from "./components/NewTransaction.jsx";
 import AllTransaction from "./components/AllTransaction.jsx";
 import "./App.css";
-
-// <div className="">
-//   {/* <Navbar />
-//   <div className="flex flex-col md:flex-row gap-8 md:gap-0 mt-12 md:mt-0 justify-center items-center">
-//     <div className="w-full md:w-1/2 text-center font-h2 font-bold">
-//       Money Transfer
-//     </div>
-//     <Login />
-//   </div> */}
-//   {/* <Home /> */}
-// </div>
+import Auth from "./components/Auth.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const App = () => {
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />}>
-          <Route path="/" element={<AllUser />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route
-            path="/new-transaction/:givenUserName?"
-            element={<NewTransaction />}
-          />
-          <Route path="/all-transactions" element={<AllTransaction />} />
-        </Route>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route element={<Auth />}>
+          <Route path="/" element={<Home />} exact>
+            <Route index element={<AllUser />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route
+              path="/new-transaction/:givenUserName?"
+              element={<NewTransaction />}
+            />
+            <Route path="/all-transactions" element={<AllTransaction />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

@@ -20,20 +20,61 @@ function Leftbar() {
     <div
       className={`col-span-2 px-8 py-2 hidden lg:flex flex-col gap-8 font-base font-semibold`}
     >
-      <div className="cursor-pointer">
-        <NavLink to="/">All Users</NavLink>
+      <div className="">
+        <NavLink
+          className={({ isActive }) =>
+            `${
+              isActive ? "text-inherit" : "text-gray"
+            } cursor-pointer hover:underline underline-offset-2`
+          }
+          to="/"
+        >
+          All Users
+        </NavLink>
       </div>
-      <div className="cursor-pointer">
-        <NavLink to="/new-transaction">New Transaction</NavLink>
+      <div className="">
+        <NavLink
+          className={({ isActive }) =>
+            `${
+              isActive ? "text-inherit" : "text-gray"
+            } cursor-pointer hover:underline underline-offset-2`
+          }
+          to="/new-transaction"
+        >
+          New Transaction
+        </NavLink>
       </div>
-      <div className="cursor-pointer">
-        <NavLink to="/all-transactions">Transaction History</NavLink>
+      <div className="">
+        <NavLink
+          className={({ isActive }) =>
+            `${
+              isActive ? "text-inherit" : "text-gray"
+            } cursor-pointer hover:underline underline-offset-2`
+          }
+          to="/all-transactions"
+        >
+          Transaction History
+        </NavLink>
       </div>
-      <div className="cursor-pointer">
-        <NavLink to="/profile">My Profile</NavLink>
+      <div className="">
+        <NavLink
+          className={({ isActive }) =>
+            `${
+              isActive ? "text-inherit" : "text-gray"
+            } cursor-pointer hover:underline underline-offset-2`
+          }
+          to="/profile"
+        >
+          My Profile
+        </NavLink>
       </div>
-      <div className="cursor-pointer">
-        <button onClick={handleLogout}>Logout</button>
+      <div className="">
+        <button
+          className="cursor-pointer text-gray hover:underline underline-offset-2 hover:text-inherit"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

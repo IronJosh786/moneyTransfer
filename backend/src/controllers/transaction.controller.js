@@ -13,6 +13,10 @@ const newTransaction = asyncHandler(async (req, res) => {
     let { to, amount, message } = req.body;
     amount = parseInt(amount);
 
+    if (req.user?.username === to) {
+        throw new ApiError(400, "Cannot send to self");
+    }
+
     try {
         const sender = await MoneyUser.findOne({
             _id: req.user?._id,

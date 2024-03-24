@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import Login from "../pages/Login";
+import { base } from "../../constant.js";
 
 function AllTransaction() {
   const { userData } = useSelector((state) => state.user);
@@ -9,12 +10,18 @@ function AllTransaction() {
   const [allTransaction, setallTransaction] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  axios.defaults.withCredentials = true;
+  const token = userData?.token;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
   useEffect(() => {
     const fetchAllTransactions = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(
-          "/api/v2/users/get-transaction-history"
+          `${base}/api/v2/users/get-transaction-history`
         );
         if (response.data.success) setSuccess(response.data.data);
         setallTransaction(response.data.message.transactionHistory);
@@ -30,6 +37,8 @@ function AllTransaction() {
           // Something happened in setting up the request that triggered an error
           setError("An error occurred. Please try again later.");
         }
+      } finally {
+        setLoading(false);
       }
     };
     fetchAllTransactions();
@@ -54,7 +63,7 @@ function AllTransaction() {
     return (
       <div
         key={entry._id}
-        className="bg-primary_light dark:bg-primary_dark text-white rounded-md border-gray p-2 flex flex-col justify-center items-center text-center gap-4"
+        className="bg-primary_light dark:bg-primary_dark text-white rounded-md border-gray p-2 flex flex-col justify-center items-center text-center gap-4 mb-8"
       >
         <div className="flex items-center gap-4">
           <div className="flex flex-col gap-4 items-center">
@@ -100,7 +109,17 @@ function AllTransaction() {
     <div className={`col-span-8 px-8 lg:px-0`}>
       <h4 className="font-h4">All Transactions</h4>
       <div className="my-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        {allTransaction.length === 0 ? "No transaction to show" : ""}
+        {loading ? (
+          <div className="font-sm text-center mt-4 text-gray">
+            Processing...
+          </div>
+        ) : (
+          allTransaction.length === 0 && (
+            <div className="font-sm text-center mt-4 text-gray">
+              No transaction to show
+            </div>
+          )
+        )}
         {allTransaction.map((singleTransaction) =>
           transactionTemplate(singleTransaction)
         )}

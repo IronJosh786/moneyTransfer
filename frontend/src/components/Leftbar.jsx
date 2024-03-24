@@ -1,16 +1,23 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { setData } from "../features/userSlice.js";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { base } from "../../constant.js";
 
 function Leftbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  axios.defaults.withCredentials = true;
+  const { userData } = useSelector((state) => state.user);
+  const token = userData?.token;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
   const handleLogout = async () => {
-    const response = await axios.post("/api/v2/users/logout");
+    const response = await axios.post(`${base}/api/v2/users/logout`);
     if (response.data.success) {
+      localStorage.removeItem("userData");
       dispatch(setData(null));
       navigate("/login");
     }

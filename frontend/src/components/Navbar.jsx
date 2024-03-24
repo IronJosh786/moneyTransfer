@@ -5,6 +5,7 @@ import "../App.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { setData } from "../features/userSlice.js";
 import axios from "axios";
+import { base } from "../../constant.js";
 
 function Navbar() {
   const { isDarkMode } = useSelector((state) => state.darkMode);
@@ -13,13 +14,18 @@ function Navbar() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const navigate = useNavigate();
 
+  axios.defaults.withCredentials = true;
+  const token = userData?.token;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
   const handleToggleTheme = () => {
     dispatch(toggleTheme());
   };
 
   const handleLogout = async () => {
-    const response = await axios.post("/api/v2/users/logout");
+    const response = await axios.post(`${base}/api/v2/users/logout`);
     if (response.data.success) {
+      localStorage.removeItem("userData");
       dispatch(setData(null));
       navigate("/login");
     }
@@ -35,8 +41,12 @@ function Navbar() {
 
   return (
     <div className="relative flex justify-between items-center px-8 py-1 mb-4 shadow-md shadow-gray">
-      <NavLink to={"/"} className="font-h2 cursor-pointer">
+      <NavLink
+        to={"/"}
+        className="font-h2 cursor-pointer flex justify-center items-center gap-2"
+      >
         <i className="ri-exchange-dollar-line"></i>
+        <p className="hidden sm:block font-h4 font-semibold">Money Transfer</p>
       </NavLink>
       <div className="flex gap-8">
         <button

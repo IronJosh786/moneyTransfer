@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "../fetchData.js";
 import { useParams } from "react-router-dom";
+import { base } from "../../constant.js";
 
 function NewTransaction() {
   const { givenUserName } = useParams() || "";
@@ -17,6 +18,10 @@ function NewTransaction() {
 
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.user);
+
+  axios.defaults.withCredentials = true;
+  const token = userData?.token;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
   const handleChange = (e) => {
     setDetails({ ...details, [e.target.id]: e.target.value });
@@ -35,11 +40,11 @@ function NewTransaction() {
 
     try {
       const response = await axios.post(
-        "/api/v2/transactions/new-transaction",
+        `${base}/api/v2/transactions/new-transaction`,
         transactionDetails
       );
       if (response.data.data) setSuccess(response.data.data);
-      await fetchData(dispatch);
+      await fetchData(dispatch, userData);
     } catch (error) {
       if (error.response) {
         // Server responded with an error
@@ -81,7 +86,7 @@ function NewTransaction() {
           type="text"
           value={details.username}
           onChange={handleChange}
-          className="p-1 font-sm rounded-md border border-gray dark:bg-bg_dark"
+          className="px-4 py-2 leading-4 font-sm rounded-md border border-gray dark:bg-bg_dark"
         />
         <label htmlFor="amount" className="font-base font-medium">
           Amount<span className="text-sent">*</span>
@@ -90,7 +95,7 @@ function NewTransaction() {
           id="amount"
           type="number"
           onChange={handleChange}
-          className="p-1 font-sm rounded-md border border-gray dark:bg-bg_dark"
+          className="px-4 py-2 leading-4 font-sm rounded-md border border-gray dark:bg-bg_dark"
         />
         <label htmlFor="message" className="font-base font-medium">
           Message<span className="text-sent">*</span>
@@ -98,9 +103,9 @@ function NewTransaction() {
         <textarea
           id="message"
           cols="20"
-          rows="3"
+          rows="1"
           onChange={handleChange}
-          className="shrink border border-gray rounded-md p-1 font-sm resize-none dark:bg-bg_dark"
+          className="px-4 py-2 leading-4 font-sm border border-gray rounded-md resize-none dark:bg-bg_dark"
         ></textarea>
         <button
           className="p-2 rounded-md font-sm text-white bg-primary_dark dark:bg-primary_light hover:bg-primary_light dark:hover:bg-primary_dark"
@@ -108,7 +113,9 @@ function NewTransaction() {
         >
           Send <i className="ri-send-plane-2-fill"></i>
         </button>
-        <div className="text-center lg:hidden">Balance: {userData.balance}</div>
+        <div className="text-center lg:hidden">
+          Balance: $ {userData.balance}
+        </div>
         {error && (
           <div className="font-sm text-center mt-8 text-sent">{error}</div>
         )}

@@ -1,11 +1,17 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Login from "../pages/Login";
-import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
 
 function Auth() {
-  const token = Cookies.get("accessToken");
-  return token ? <Outlet /> : <Login />;
+  const { userData } = useSelector((state) => state.user);
+
+  const token =
+    userData?.token || JSON.parse(localStorage.getItem("userData")) || "";
+  if (!token) {
+    return <Login />;
+  }
+  return <Outlet />;
 }
 
 export default Auth;

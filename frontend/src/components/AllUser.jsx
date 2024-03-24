@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import NewTransaction from "./NewTransaction";
+import { base } from "../../constant.js";
+import { useSelector } from "react-redux";
 
 function AllUser() {
   const [allUser, setAllUser] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  axios.defaults.withCredentials = true;
+  const { userData } = useSelector((state) => state.user);
+  const token = userData?.token;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
   const handleSend = (givenUsername) => {
     navigate(`/new-transaction/${givenUsername}`);
@@ -16,8 +23,9 @@ function AllUser() {
 
   useEffect(() => {
     const fetchAllUsers = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get("/api/v2/users/get-all-users");
+        const response = await axios.get(`${base}/api/v2/users/get-all-users`);
         if (response.data.success) setSuccess(response.data.data);
         setAllUser(response.data.message);
       } catch (error) {
@@ -32,6 +40,8 @@ function AllUser() {
           // Something happened in setting up the request that triggered an error
           setError("An error occurred. Please try again later.");
         }
+      } finally {
+        setLoading(false);
       }
     };
     fetchAllUsers();
@@ -49,7 +59,7 @@ function AllUser() {
   };
 
   return (
-    <div className={`col-span-8 px-8 lg:px-0`}>
+    <div className={`col-span-8 px-8 lg:px-0 mb-8`}>
       <h4 className="font-h4">All Users</h4>
       <div className="my-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-white">
         {allUser.map((singleUser) => (
@@ -67,7 +77,9 @@ function AllUser() {
               </div>
               <div className="flex flex-col">
                 <p className="font-sm font-medium">{singleUser.username}</p>
-                <p className="font-base capitalize">{singleUser.fullName}</p>
+                <p className="mt-1 font-base capitalize">
+                  {singleUser.fullName}
+                </p>
               </div>
             </div>
             <div>
@@ -80,6 +92,11 @@ function AllUser() {
             </div>
           </div>
         ))}
+        {loading && (
+          <div className="font-sm text-center mt-4 text-gray">
+            Processing...
+          </div>
+        )}
       </div>
     </div>
   );

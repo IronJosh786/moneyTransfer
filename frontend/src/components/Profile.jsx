@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchData } from "../fetchData.js";
 import axios from "axios";
+import { base } from "../../constant.js";
 
 function Profile() {
   const dispatch = useDispatch();
@@ -19,6 +20,10 @@ function Profile() {
   const [imageError, setImageError] = useState("");
   const [imageSuccess, setImageSuccess] = useState("");
 
+  axios.defaults.withCredentials = true;
+  const token = userData?.token;
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
   const handleChange = (e) => {
     setDetails({ ...details, [e.target.id]: e.target.value });
   };
@@ -34,6 +39,7 @@ function Profile() {
 
     if (!image) {
       setImageError("Image is required");
+      setLoading(false);
       return;
     }
 
@@ -42,17 +48,16 @@ function Profile() {
 
     try {
       const response = await axios.patch(
-        "/api/v2/users/update-profilePicture",
+        `${base}/api/v2/users/update-profilePicture`,
         formData
       );
 
       if (response.data.success) {
         setImageSuccess("Image updated");
       }
-      await fetchData(dispatch);
+      await fetchData(dispatch, userData);
       setImage(null);
     } catch (error) {
-      setLoading(false);
       if (error.response) {
         // Server responded with an error
         const errorMessage = extractErrorMessage(error.response.data);
@@ -77,7 +82,10 @@ function Profile() {
       newPassword: details.newPassword,
     };
     try {
-      const response = await axios.post("/api/v2/users/change-password", data);
+      const response = await axios.post(
+        `${base}/api/v2/users/change-password`,
+        data
+      );
       if (response.data.success) {
         setSuccess("Password updated");
       }
@@ -108,7 +116,7 @@ function Profile() {
   };
 
   return (
-    <div className={`col-span-8 px-8 lg-px-0`}>
+    <div className={`col-span-8 px-8 lg-px-0 mb-8`}>
       <h4 className="font-h4">Profile</h4>
       <div className="my-4 flex flex-col items-center md:items-start text-center md:flex-row gap-4 md:justify-between font-sm bg-primary_light dark:bg-primary_dark rounded-md p-2 text-white">
         <div className="flex flex-col gap-4 items-center justify-center">
@@ -152,34 +160,32 @@ function Profile() {
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-8 md:mt-0">
           <div className="font-base font-semibold underline">Details</div>
-          <p>
-            <span className="font-semibold underline underline-offset-2">
-              Username:
-            </span>{" "}
-            {userData.username}
-          </p>
-          <p>
-            <span className="font-semibold underline underline-offset-2">
-              Full Name:
-            </span>{" "}
-            {userData.fullName}
-          </p>
-          <p>
-            <span className="font-semibold underline underline-offset-2">
-              Email:
-            </span>{" "}
-            {userData.email}
-          </p>
-          <p>
-            <span className="font-semibold underline underline-offset-2">
-              Balance:
-            </span>{" "}
-            $ {userData.balance}
-          </p>
+          <div className="flex flex-col gap-4">
+            <p>
+              <span className="font-semibold underline-offset-2">
+                Username:
+              </span>{" "}
+              {userData.username}
+            </p>
+            <p>
+              <span className="font-semibold underline-offset-2">
+                Full Name:
+              </span>{" "}
+              <span className="uppercase">{userData.fullName}</span>
+            </p>
+            <p>
+              <span className="font-semibold underline-offset-2">Email:</span>{" "}
+              {userData.email}
+            </p>
+            <p>
+              <span className="font-semibold underline-offset-2">Balance:</span>{" "}
+              $ {userData.balance}
+            </p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mt-8 md:mt-0">
           <div className="font-base font-semibold underline">
             Change Password
           </div>
